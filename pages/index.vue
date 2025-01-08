@@ -97,7 +97,7 @@ async function createPlaylist() {
     }
   }
   catch (error) {
-    console.error(error)
+    console.error('Failed to add tracks to playlist', error)
   }
 
   createPlaylistLoading.value = false
@@ -130,7 +130,8 @@ watchEffect(async () => {
       Spotify Snapshot
     </h1>
     <p class="mb-4">
-      Snapshot the last 50 songs you listened to and save it into a playlist.
+      Snapshot the last 50 songs you listened to and instantly save it into a playlist.
+      Useful if you've been DJ'ing a party or something and want to save the vibes you cooked up.
     </p>
 
     <template v-if="spotifyAccessToken">
@@ -193,7 +194,7 @@ watchEffect(async () => {
         </button>
 
         <div v-if="success">
-          <div>Success!</div>
+          <div>Success! ✅</div>
           <div>
             See your playlist here:
             <a :href="spotifyPlaylistCreated?.external_urls?.spotify">
