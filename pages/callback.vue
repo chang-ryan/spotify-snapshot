@@ -7,6 +7,7 @@ const spotifyUser = useSpotifyUser()
 const {
   public: {
     spotifyClientId,
+    spotifyRedirectUri,
   },
 } = useRuntimeConfig()
 
@@ -17,7 +18,7 @@ async function getAccessToken(code: string) {
   params.append('client_id', spotifyClientId)
   params.append('grant_type', 'authorization_code')
   params.append('code', code)
-  params.append('redirect_uri', 'http://localhost:3000/callback')
+  params.append('redirect_uri', String(spotifyRedirectUri))
   params.append('code_verifier', verifier!)
 
   const result = await fetch('https://accounts.spotify.com/api/token', {
