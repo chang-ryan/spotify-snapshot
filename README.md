@@ -2,8 +2,9 @@
 
 ## `.env`
 
-```
+```sh
 NUXT_PUBLIC_SPOTIFY_CLIENT_ID=spotify-client-id
+NUXT_PUBLIC_SPOTIFY_REDIRECT_URI=http://localhost:3000/callback
 ```
 
 ## Flow
