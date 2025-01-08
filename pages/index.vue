@@ -157,7 +157,7 @@ watch(
     </h1>
     <p class="mb-4">
       Snapshot the last 50 songs you listened to and instantly save it into a new playlist.
-      Useful if you've been DJ'ing a party or something and want to save the vibes you cooked up.
+      Useful if you've been DJ'ing a party or something and want to save the immaculate vibes you just cooked up.
     </p>
 
     <template v-if="spotifyAccessToken">
