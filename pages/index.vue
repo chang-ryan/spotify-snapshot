@@ -13,7 +13,7 @@ const spotifyUser = useSpotifyUser()
 const spotifyPlaylistCreated = ref()
 const playlistName = ref('')
 const trackQuantity = ref(50)
-const datetime12h = ref()
+// const datetime12h = ref()
 const publicPlaylist = ref(true)
 const playHistory = ref()
 const success = ref(false)
@@ -116,8 +116,6 @@ watchEffect(async () => {
     })
 
     playHistory.value = await result.json()
-
-    console.log(playHistory.value)
   }
   catch (error) {
     console.error(error)
