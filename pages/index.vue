@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import debounce from 'lodash-es/debounce'
 import get from 'lodash-es/get'
 
 const {
@@ -18,6 +19,7 @@ const trackQuantity = ref(50)
 const publicPlaylist = ref(true)
 const playHistory = ref()
 const success = ref(false)
+const errors: Ref<string[]> = ref([])
 
 async function redirectToAuthCodeFlow() {
   const verifier = generateCodeVerifier(128)
@@ -60,6 +62,9 @@ const createPlaylistLoading = ref(false)
 async function createPlaylist() {
   createPlaylistLoading.value = true
 
+  if (errors.value.length > 0)
+    return
+
   // 1. Create playlist
   try {
     const result = await fetch(`https://api.spotify.com/v1/users/${spotifyUser.value.id}/playlists`, {
@@ -74,11 +79,11 @@ async function createPlaylist() {
     spotifyPlaylistCreated.value = await result.json()
   }
   catch (error) {
-    console.error(error)
+    console.error('Failed to create playlist', error)
     throw new Error('Failed to create playlist')
   }
 
-  // 3. Add tracks to playlist
+  // 2. Add tracks to playlist
   try {
     const result = await fetch(`https://api.spotify.com/v1/playlists/${spotifyPlaylistCreated.value.id}/tracks`, {
       method: 'POST',
@@ -103,25 +108,46 @@ async function createPlaylist() {
   createPlaylistLoading.value = false
 }
 
-watchEffect(async () => {
-  try {
-    const params = new URLSearchParams({
-      limit: String(trackQuantity.value),
-      before: String(new Date().getTime()),
-    })
-    const url = `https://api.spotify.com/v1/me/player/recently-played?${params.toString()}`
+watchEffect(() => {
+  errors.value = []
 
-    const result = await fetch(url, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${spotifyAccessToken.value}` },
-    })
-
-    playHistory.value = await result.json()
+  if (!playlistName.value) {
+    errors.value.push('Playlist name is required')
+    createPlaylistLoading.value = false
   }
-  catch (error) {
-    console.error(error)
+
+  if (trackQuantity.value < 1 || trackQuantity.value > 50) {
+    errors.value.push('Track quantity must be between 1 and 50')
+    createPlaylistLoading.value = false
   }
 })
+
+watch(
+  trackQuantity,
+  debounce(
+    async () => {
+      try {
+        const params = new URLSearchParams({
+          limit: String(trackQuantity.value),
+          before: String(new Date().getTime()),
+        })
+        const url = `https://api.spotify.com/v1/me/player/recently-played?${params.toString()}`
+
+        const result = await fetch(url, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${spotifyAccessToken.value}` },
+        })
+
+        playHistory.value = await result.json()
+      }
+      catch (error) {
+        console.error(error)
+      }
+    },
+    500,
+  ),
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -130,12 +156,12 @@ watchEffect(async () => {
       Spotify Snapshot
     </h1>
     <p class="mb-4">
-      Snapshot the last 50 songs you listened to and instantly save it into a playlist.
+      Snapshot the last 50 songs you listened to and instantly save it into a new playlist.
       Useful if you've been DJ'ing a party or something and want to save the vibes you cooked up.
     </p>
 
     <template v-if="spotifyAccessToken">
-      <div class="w-80">
+      <div class="w-96">
         <div class="text-center mb-2">
           Hello <span class="text-[#19e526]">{{ spotifyUser.display_name }}</span>
         </div>
@@ -146,7 +172,10 @@ watchEffect(async () => {
           </h2>
           <div class="flex flex-col">
             <label for="playlist-name" class="mb-1">Name your playlist:</label>
-            <input id="playlist-name" v-model="playlistName" type="text" placeholder="The Best Day Ever" class="p-2 outline-none border border-white">
+            <input
+              id="playlist-name" v-model="playlistName" type="text" placeholder="The Best Day Ever"
+              class="p-2 outline-none border border-white" required
+            >
           </div>
         </div>
 
@@ -168,7 +197,10 @@ watchEffect(async () => {
 
           <div class="flex flex-col">
             <label for="track-quantity" class="mb-1">How many songs do you want:</label>
-            <input id="track-quantity" v-model="trackQuantity" type="text" placeholder="1-50" class="p-2 outline-none border border-white">
+            <input
+              id="track-quantity" v-model="trackQuantity" type="text" placeholder="1-50"
+              class="p-2 outline-none border border-white" required
+            >
             <span class="text-sm">Max 50</span>
           </div>
         </div>
@@ -181,27 +213,24 @@ watchEffect(async () => {
 
         <div>
           <label for="public-playlist" class="text-sm mr-2">Public</label>
-          <input
-            v-model="publicPlaylist"
-            type="checkbox"
-            true-value="true"
-            false-value="false"
-          >
+          <input v-model="publicPlaylist" type="checkbox" true-value="true" false-value="false">
         </div>
 
-        <button
-          :disabled="createPlaylistLoading"
-          class="button"
-          @click="createPlaylist"
-        >
+        <button :disabled="createPlaylistLoading" class="button" @click="createPlaylist">
           {{ createPlaylistLoading ? 'Creating Playlist...' : 'Create Playlist' }}
         </button>
+
+        <div v-if="errors">
+          <div v-for="error in errors" :key="error" class="text-sm text-red-400">
+            {{ error }}
+          </div>
+        </div>
 
         <div v-if="success">
           <div>Success! ✅</div>
           <div>
             See your playlist here:
-            <a :href="spotifyPlaylistCreated?.external_urls?.spotify">
+            <a :href="spotifyPlaylistCreated?.external_urls?.spotify" target="_blank">
               {{ spotifyPlaylistCreated?.external_urls?.spotify }}
             </a>
           </div>
@@ -209,11 +238,7 @@ watchEffect(async () => {
       </div>
     </template>
     <template v-else>
-      <button
-        v-if="!spotifyAccessToken"
-        class="button"
-        @click="redirectToAuthCodeFlow"
-      >
+      <button v-if="!spotifyAccessToken" class="button" @click="redirectToAuthCodeFlow">
         Log in with your Spotify account
       </button>
     </template>
