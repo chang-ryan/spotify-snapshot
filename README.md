@@ -1,75 +1,21 @@
-# Nuxt Minimal Starter
+# Spotify Snapshot
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## `.env`
 
-## Setup
-
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+```
+NUXT_PUBLIC_SPOTIFY_CLIENT_ID=spotify-client-id
 ```
 
-## Development Server
+## Flow
 
-Start the development server on `http://localhost:3000`:
+1. https://developer.spotify.com/documentation/web-api/reference/get-recently-played
 
-```bash
-# npm
-npm run dev
+- Get a user's recently played tracks
 
-# pnpm
-pnpm dev
+2. https://developer.spotify.com/documentation/web-api/reference/create-playlist
 
-# yarn
-yarn dev
+- Create a new playlist
 
-# bun
-bun run dev
-```
+3. https://developer.spotify.com/documentation/web-api/reference/add-tracks-to-playlist
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- Add all tracks returned from step 1 to playlist created in step 2
