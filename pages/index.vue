@@ -161,7 +161,7 @@ watch(
     </p>
 
     <template v-if="spotifyAccessToken">
-      <div class="w-96">
+      <div class="w-96 px-4 sm:px-0">
         <div class="text-center mb-2">
           Hello <span class="text-[#19e526]">{{ spotifyUser.display_name }}</span>
         </div>
@@ -198,8 +198,9 @@ watch(
           <div class="flex flex-col">
             <label for="track-quantity" class="mb-1">How many songs do you want:</label>
             <input
-              id="track-quantity" v-model="trackQuantity" type="text" placeholder="1-50"
+              id="track-quantity" v-model="trackQuantity" type="number" placeholder="1-50"
               class="p-2 outline-none border border-white" required
+              min="1" max="50"
             >
             <span class="text-sm">Max 50</span>
           </div>
