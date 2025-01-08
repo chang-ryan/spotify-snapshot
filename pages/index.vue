@@ -189,7 +189,11 @@ watchEffect(async () => {
           >
         </div>
 
-        <button :disabled="createPlaylistLoading" class="border border-white p-2 rounded" @click="createPlaylist">
+        <button
+          :disabled="createPlaylistLoading"
+          class="button"
+          @click="createPlaylist"
+        >
           {{ createPlaylistLoading ? 'Creating Playlist...' : 'Create Playlist' }}
         </button>
 
@@ -205,8 +209,12 @@ watchEffect(async () => {
       </div>
     </template>
     <template v-else>
-      <button v-if="!spotifyAccessToken" @click="redirectToAuthCodeFlow">
-        Authorize
+      <button
+        v-if="!spotifyAccessToken"
+        class="button"
+        @click="redirectToAuthCodeFlow"
+      >
+        Log in with your Spotify account
       </button>
     </template>
   </div>
@@ -221,5 +229,12 @@ watchEffect(async () => {
 .step-title {
   @apply text-lg;
   @apply mb-2;
+}
+
+.button {
+  @apply border;
+  @apply border-white;
+  @apply p-2;
+  @apply rounded;
 }
 </style>
