@@ -161,7 +161,7 @@ watch(
     </p>
 
     <template v-if="spotifyAccessToken">
-      <div class="w-96 px-4 sm:px-0">
+      <div class="w-96 px-4 sm:px-0 mb-8">
         <div class="text-center mb-2">
           Hello <span class="text-[#19e526]">{{ spotifyUser.display_name }}</span>
         </div>
