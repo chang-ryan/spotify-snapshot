@@ -151,7 +151,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex items-center flex-col p-16">
+  <div class="flex items-center flex-col p-16 min-h-screen">
     <h1 class="text-xl mb-2">
       Spotify Snapshot
     </h1>
@@ -243,6 +243,12 @@ watch(
         Log in with your Spotify account
       </button>
     </template>
+
+    <div class="flex-1" />
+
+    <footer>
+      Made by <a href="https://open.spotify.com/user/changryan" target="_blank" class="text-[#19e526]">changryan</a>
+    </footer>
   </div>
 </template>
 
